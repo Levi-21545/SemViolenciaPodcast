@@ -23,7 +23,7 @@ class _LoginPageState extends State<LoginPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _senhaController = TextEditingController();
-  bool isPasswordVisible = false;
+  bool passwordObs = true;
 
   SnackBar snackBarCerto = SnackBar(content: Text('Login Realizado'));
   SnackBar snackBarErro = SnackBar(content: Text('Login Inválido'));
@@ -88,9 +88,24 @@ class _LoginPageState extends State<LoginPage> {
                       ),
                       Padding(padding: EdgeInsets.fromLTRB(0, 10, 0, 10)),
                       TextFormField(
-                        obscureText: true,
+                        obscureText: passwordObs,
                         style: TextStyle(color: Colors.white),
                         decoration: InputDecoration(
+                          contentPadding: EdgeInsets.fromLTRB(15, 0, 30, 0),
+                          suffixIcon: IconButton(
+                            onPressed: () {
+                              setState(() {
+                                passwordObs = !passwordObs;
+                              });
+                            },
+                            icon: Icon(
+                              passwordObs
+                                  ? Icons.visibility_off
+                                  : Icons.visibility,
+                              color: Colors.white,
+                              size: 20,
+                            ),
+                          ),
                           label: Text(
                             'Senha',
                             style: TextStyle(color: Colors.white),
@@ -132,7 +147,6 @@ class _LoginPageState extends State<LoginPage> {
                                   MaterialPageRoute(
                                     builder: (context) =>
                                         MyHomePageConv(title: 'Home'),
-                                    //PlayerPage(),
                                   ),
                                 );
                               },

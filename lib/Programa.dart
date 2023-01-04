@@ -61,6 +61,8 @@ class _ProgramaState extends State<ProgramaPage> {
       showDialog(
           context: this.context,
           builder: (_) => AlertDialog(
+              backgroundColor: Colors.grey[900],
+              titleTextStyle: TextStyle(color: Colors.white, fontSize: 20),
               title: Text('Editar Episódio'),
               content: Container(
                   width: 600,
@@ -211,7 +213,8 @@ class _ProgramaState extends State<ProgramaPage> {
                                             "Tem certeza que deseja exlcuir?"),
                                       )) {
                                     actionPopUpItemSelected(value, list1[i]);
-                                  } else {
+                                  }
+                                  if (value == 'editar') {
                                     actionPopUpItemSelected(value, list1[i]);
                                   }
                                 }),
@@ -322,7 +325,6 @@ class _ProgramaState extends State<ProgramaPage> {
               ),
             ),
             Padding(padding: EdgeInsets.fromLTRB(0, 20, 0, 0)),
-
             //DIVISAO
             Container(
               child: Row(
@@ -607,143 +609,158 @@ class _EditState extends State<Edit> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+        backgroundColor: Colors.grey[900],
         body: Center(
             child: Container(
-      child: Form(
-        key: _formKey,
-        child: Padding(
-          padding: const EdgeInsets.all(10.0),
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              //TITULO
-              TextFormField(
-                controller: ctitulo,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                    hintText: "",
-                    labelText: "Titulo",
-                    labelStyle: TextStyle(color: Colors.white)),
-                validator: ((value) {
-                  if (value!.isEmpty) {
-                    return "Informe o título";
-                  }
-                }),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-              //DIA
-              TextFormField(
-                controller: cdia,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "",
-                  labelText: "Digite a data",
-                  labelStyle: TextStyle(color: Colors.white),
-                ),
-                validator: ((value) {
-                  if (value!.isEmpty) {
-                    return "Informe a data";
-                  }
-                }),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
+          child: Form(
+            key: _formKey,
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  //TITULO
+                  TextFormField(
+                    controller: ctitulo,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                        hintText: "",
+                        labelText: "Titulo",
+                        labelStyle: TextStyle(color: Colors.white)),
+                    validator: ((value) {
+                      if (value!.isEmpty) {
+                        return "Informe o título";
+                      }
+                    }),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  //DIA
+                  TextFormField(
+                    controller: cdia,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "",
+                      labelText: "Digite a data",
+                      labelStyle: TextStyle(color: Colors.white),
+                    ),
+                    validator: ((value) {
+                      if (value!.isEmpty) {
+                        return "Informe a data";
+                      }
+                    }),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
 
-              //DURACAO
-              TextFormField(
-                controller: cdura,
-                style: TextStyle(color: Colors.white),
-                decoration: InputDecoration(
-                  hintText: "",
-                  labelText: "Duração",
-                  labelStyle: TextStyle(color: Colors.white),
-                ),
-                validator: ((value) {
-                  if (value!.isEmpty) {
-                    return "Informe a duração";
-                  }
-                }),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
+                  //DURACAO
+                  TextFormField(
+                    controller: cdura,
+                    style: TextStyle(color: Colors.white),
+                    decoration: InputDecoration(
+                      hintText: "",
+                      labelText: "Duração",
+                      labelStyle: TextStyle(color: Colors.white),
+                    ),
+                    validator: ((value) {
+                      if (value!.isEmpty) {
+                        return "Informe a duração";
+                      }
+                    }),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Column(
+                        children: [
+                          //ARQ
+                          Image.memory(
+                            pickedFileArq != null
+                                ? imageDataCheck
+                                : imageDataThumb!,
+                            width: 100,
+                            height: 100,
+                            alignment: Alignment.center,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(5),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              chooseImageArq();
+                            },
+                            child: Text("Selecionar Arquivo"),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(5),
+                          ),
+                        ],
+                      ),
+                      Padding(padding: EdgeInsets.all(20)),
+                      Column(
+                        children: [
+                          //THUMB
+                          Image.memory(
+                            pickedFileThumb != null
+                                ? pickedFileThumb!.files[0].bytes!
+                                : imageDataThumb!,
+                            width: 100,
+                            height: 100,
+                            alignment: Alignment.center,
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(5),
+                          ),
+                          ElevatedButton(
+                            onPressed: () {
+                              chooseImageThumb();
+                            },
+                            child: Text("Selecionar Arquivo"),
+                          ),
+                          Padding(
+                            padding: EdgeInsets.all(5),
+                          ),
+                        ],
+                      )
+                    ],
+                  ),
+                  Padding(padding: EdgeInsets.all(10)),
+                  //SALVAR
+                  SizedBox(
+                    width: 152,
+                    child: ElevatedButton(
+                      child: Text("Salvar"),
+                      onPressed: () {
+                        if (_formKey.currentState!.validate()) {
+                          editData();
+                          Navigator.pop(context);
+                        }
+                      },
+                    ),
+                  ),
+                  Padding(
+                    padding: EdgeInsets.all(5),
+                  ),
 
-              //ARQ
-              Image.memory(
-                pickedFileArq != null ? imageDataCheck : imageDataThumb!,
-                width: 100,
-                height: 100,
-                alignment: Alignment.center,
+                  //CANCELAR
+                  SizedBox(
+                    width: 152,
+                    child: ElevatedButton(
+                      child: Text("Cancelar"),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ),
+                ],
               ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  chooseImageArq();
-                },
-                child: Text("Selecionar Arquivo"),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-
-              //THUMB
-              Image.memory(
-                pickedFileThumb != null
-                    ? pickedFileThumb!.files[0].bytes!
-                    : imageDataThumb!,
-                width: 100,
-                height: 100,
-                alignment: Alignment.center,
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  chooseImageThumb();
-                },
-                child: Text("Selecionar Arquivo"),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-
-              //SALVAR
-              SizedBox(
-                width: 152,
-                child: ElevatedButton(
-                  child: Text("Salvar"),
-                  onPressed: () {
-                    if (_formKey.currentState!.validate()) {
-                      editData();
-                      Navigator.pop(context);
-                    }
-                  },
-                ),
-              ),
-              Padding(
-                padding: EdgeInsets.all(5),
-              ),
-
-              //CANCELAR
-              SizedBox(
-                width: 152,
-                child: ElevatedButton(
-                  child: Text("Cancelar"),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-            ],
+            ),
           ),
-        ),
-      ),
-    )));
+        )));
   }
 }

@@ -3,7 +3,9 @@
 import 'dart:convert';
 
 import 'package:confirm_dialog/confirm_dialog.dart';
+import 'package:emailjs/emailjs.dart';
 import 'package:flutter/material.dart';
+import 'package:mask_text_input_formatter/mask_text_input_formatter.dart';
 import 'package:semviolencia1/Episodio.dart';
 import 'package:semviolencia1/Login.dart';
 import 'package:http/http.dart' as http;
@@ -163,8 +165,47 @@ Widget mostraLista(List<ProgramaPage> list1) {
       });
 }
 
+Future sendEmailJS({
+  required String cnome,
+  required String cemail,
+  required String ctelefone,
+  required String cmsg,
+}) async {
+  try {
+    await EmailJS.send(
+      'service_dj0ptln',
+      'template_qth3o1v',
+      {
+        'user_email': cemail,
+        'user_message': cmsg,
+        'user_phone': ctelefone,
+        'user_name': cnome,
+      },
+      const Options(
+        publicKey: 'IK5g6Mdwpj7ldWwE9',
+        privateKey: 'oCv-c3LLaauso31Zsd2CK',
+      ),
+    );
+    print('SUCCESS!');
+  } catch (error) {
+    if (error is EmailJSResponseStatus) {
+      print('ERROR... ${error.status}: ${error.text}');
+    }
+    print(error.toString());
+  }
+}
+
 class _MyHomePageState extends State<MyHomePage> {
   final _contatoKey = GlobalKey<FormState>();
+  SnackBar snackBarMsg = SnackBar(content: Text('Mensagem enviada!'));
+  MaskTextInputFormatter maskTel =
+      MaskTextInputFormatter(mask: '(##) #####-####');
+      
+  TextEditingController cnome = new TextEditingController();
+  TextEditingController ctelefone = new TextEditingController();
+  TextEditingController cemail = new TextEditingController();
+  TextEditingController cmsg = new TextEditingController();
+
 
   void actionPopUpItemSelected(String value) {
     print(value);
@@ -341,7 +382,7 @@ class _MyHomePageState extends State<MyHomePage> {
               children: [
                 SizedBox(
                   child: Text(
-                    "O grupo organizador do projeto é constituído de três alunos do Ensino Médio Integrado ao Curso Técnico em Informática do Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Sul - Campus Erechim, sendo eles Levi da Rosa Gomes, Luiz Eduardo Gallina Sfredo e João Vitor Martins. O grupo formado no primeiro trimestre de 2022 tem como orientador o professor Miguelangelo Corteze, professor da matéria curricular de Projeto Integrador e de História, além de reger outros Núcleos do próprio instituto.",
+                    "O grupo organizador do projeto é constituído de três alunos do Ensino Médio Integrado ao Curso Técnico em Informática do Instituto Federal de Educação, Ciência e Tecnologia do Rio Grande do Sul - Campus Erechim, sendo eles Levi da Rosa Gomes, Luiz Eduardo Gallina Sfredo e João Vitor Martins. O grupo formado no primeiro trimestre de 2022 tem como orientador o professor Miguelangelo Corteze, professor da matéria curricular de Projeto Integrador e de História, além de integrar outros Núcleos do próprio instituto.",
                     textAlign: TextAlign.center,
                     style: TextStyle(
                         color: Colors.white,
@@ -397,6 +438,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               SizedBox(
                                 width: 290,
                                 child: TextFormField(
+                                  controller: cnome,
                                   style: TextStyle(color: Colors.white),
                                   cursorColor: cor,
                                   keyboardType: TextInputType.name,
@@ -419,21 +461,29 @@ class _MyHomePageState extends State<MyHomePage> {
                                 ),
                               ),
                               Padding(
-                                  padding: EdgeInsets.fromLTRB(10, 0, 20, 0)),
+                                  padding: EdgeInsets.fromLTRB(10, 0, 10, 0)),
                               //TELEFONE
                               SizedBox(
                                 width: 290,
                                 child: TextFormField(
+                                  controller: ctelefone,
                                   cursorColor: cor,
                                   style: TextStyle(color: Colors.white),
-                                  keyboardType: TextInputType.name,
+                                  keyboardType: TextInputType.phone,
+                                  inputFormatters: [maskTel],
                                   decoration: InputDecoration(
+                                      border: OutlineInputBorder(
+                                        borderSide: BorderSide(
+                                            color: Colors.white, width: 1),
+                                        borderRadius: BorderRadius.all(
+                                            Radius.circular(40)),
+                                      ),
                                       labelText: 'Telefone',
                                       labelStyle: TextStyle(
                                           color: Colors.white, fontSize: 14)),
                                   validator: ((value) {
                                     if (value!.length < 3) {
-                                      return 'Informe o nome completo';
+                                      return 'Informe o telefone completo';
                                     }
                                   }),
                                 ),
@@ -447,6 +497,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               SizedBox(
                                 width: 600,
                                 child: TextFormField(
+                                  controller: cemail,
                                   cursorColor: cor,
                                   style: TextStyle(color: Colors.white),
                                   keyboardType: TextInputType.name,
@@ -464,7 +515,7 @@ class _MyHomePageState extends State<MyHomePage> {
                                           color: Colors.white, fontSize: 14)),
                                   validator: ((value) {
                                     if (value!.length < 3) {
-                                      return 'Informe o nome completo';
+                                      return 'Informe o e-mail completo';
                                     }
                                   }),
                                 ),
@@ -478,6 +529,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               SizedBox(
                                 width: 600,
                                 child: TextField(
+                                  controller: cmsg,
                                   cursorColor: cor,
                                   style: TextStyle(color: Colors.white),
                                   keyboardType: TextInputType.multiline,
@@ -503,7 +555,13 @@ class _MyHomePageState extends State<MyHomePage> {
                             style: meuBotao,
                             onPressed: () {
                               if (_contatoKey.currentState!.validate()) {
-                                //ScaffoldMessenger.of(context).showSnackBar(snack);
+                                ScaffoldMessenger.of(context)
+                                    .showSnackBar(snackBarMsg);
+                                sendEmailJS(
+                                    cnome: cnome.text,
+                                    cemail: cemail.text,
+                                    ctelefone: ctelefone.text,
+                                    cmsg: cmsg.text);
                                 print('form ok');
                               }
                             },

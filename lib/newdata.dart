@@ -23,6 +23,7 @@ class _NewDataState extends State<NewData> {
   Uint8List imageDataCheck;
   FilePickerResult? pickedFileArq;
   FilePickerResult? pickedFileThumb;
+  PlatformFile? file;
   var temp = new Uint8List(500);
   TextEditingController ctitulo = new TextEditingController();
   TextEditingController cdata = new TextEditingController();
@@ -49,6 +50,9 @@ class _NewDataState extends State<NewData> {
   _NewDataState(this.imageData, this.imageDataCheck);
 
   Future<String> addData() async {
+    print(pickedFileArq!.files[0].name);
+    print(pickedFileThumb!.files[0].name);
+
     var url = "http://localhost/semviolencia/adddata.php";
     var request = http.MultipartRequest('POST', Uri.parse(url));
     request.fields['programa'] = programa;
@@ -62,16 +66,21 @@ class _NewDataState extends State<NewData> {
     request.files.add(http.MultipartFile.fromBytes(
         'thumbD', pickedFileThumb!.files[0].bytes!));
     var res = await request.send();
+    print(res.statusCode);
     return Future.value(res.reasonPhrase);
   }
 
   void chooseImageArq() async {
-    pickedFileArq = await FilePicker.platform
-        .pickFiles(allowMultiple: false, withData: true);
+    pickedFileArq = await FilePicker.platform.pickFiles(
+        allowMultiple: false,
+        withData: true,
+        onFileLoading: (FilePickerStatus status) => print(status),
+        type: FileType.audio);
     if (pickedFileArq != null) {
+      file = pickedFileArq!.files.first;
       try {
         setState(() {
-          final logoBase64 = pickedFileArq!.files[0].bytes;
+          final logoBase64Arq = pickedFileArq!.files[0].bytes;
         });
       } catch (err) {
         print(err);
@@ -83,11 +92,11 @@ class _NewDataState extends State<NewData> {
 
   void chooseImageThumb() async {
     pickedFileThumb = await FilePicker.platform
-        .pickFiles(allowMultiple: false, withData: true);
+        .pickFiles(allowMultiple: true, withData: true);
     if (pickedFileThumb != null) {
       try {
         setState(() {
-          final logoBase64 = pickedFileThumb!.files[0].bytes;
+          final logoBase64Thumb = pickedFileThumb!.files[0].bytes;
         });
       } catch (err) {
         print(err);
@@ -244,14 +253,16 @@ class _NewDataState extends State<NewData> {
                   Padding(padding: EdgeInsets.all(15)),
                   SizedBox(
                     width: 300,
+                    height: 100,
                     child: Column(
                       children: [
                         Image.memory(
                           pickedFileArq != null ? imageDataCheck : imageData,
-                          width: 100,
-                          height: 100,
+                          width: 60,
+                          height: 60,
                           alignment: Alignment.topCenter,
                         ),
+                        Padding(padding: EdgeInsets.fromLTRB(0, 5, 0, 5)),
                         ElevatedButton(
                           onPressed: () {
                             chooseImageArq();
@@ -264,15 +275,17 @@ class _NewDataState extends State<NewData> {
                   Padding(padding: EdgeInsets.all(15)),
                   SizedBox(
                       width: 300,
+                      height: 100,
                       child: Column(children: [
                         Image.memory(
                           pickedFileThumb != null
                               ? pickedFileThumb!.files[0].bytes!
                               : imageData,
-                          width: 100,
-                          height: 100,
+                          width: 60,
+                          height: 60,
                           alignment: Alignment.topLeft,
                         ),
+                        Padding(padding: EdgeInsets.fromLTRB(0, 5, 0, 5)),
                         ElevatedButton(
                           onPressed: () {
                             chooseImageThumb();
