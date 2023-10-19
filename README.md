@@ -5,7 +5,6 @@ Nosso último, e mais importante, projeto do Ensino Médio Integrado ao Técnico
 * Levi da Rosa Gomes
 * Luiz Eduardo Gallina Sfredo
 # Recursos futuros
-* Barra de progresso do episódio (classe *ControlButtons*);
+* Barra de progresso do episódio;
 * Implementação de tokens de acesso;
-* Link p/ redes sociais + Gerenciamento das redes sociais;
 * Tela de cadastro
